@@ -1,0 +1,26 @@
+<Application x:Class="AIChatLab.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+  <Application.Resources>
+    <SolidColorBrush x:Key="LabBg" Color="#06140F"/>
+    <SolidColorBrush x:Key="LabFg" Color="#E8FFF5"/>
+    <SolidColorBrush x:Key="LabAccent" Color="#22C55E"/>
+    <SolidColorBrush x:Key="LabSoft" Color="#4ADE80"/>
+    <SolidColorBrush x:Key="LabSurface" Color="#0A1F18"/>
+    <Style TargetType="Button">
+      <Setter Property="Background" Value="#14532D"/>
+      <Setter Property="Foreground" Value="#E8FFF5"/>
+      <Setter Property="BorderBrush" Value="#22C55E"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style TargetType="TextBox">
+      <Setter Property="Background" Value="#04110C"/>
+      <Setter Property="Foreground" Value="#E8FFF5"/>
+      <Setter Property="BorderBrush" Value="#1C4A36"/>
+      <Setter Property="Padding" Value="8,6"/>
+    </Style>
+  </Application.Resources>
+</Application>
