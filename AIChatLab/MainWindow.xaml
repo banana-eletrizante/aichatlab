@@ -3,67 +3,210 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="AI Chat Lab"
-        Width="1180" Height="720" MinWidth="960" MinHeight="640"
+        Width="1220" Height="760" MinWidth="980" MinHeight="660"
         Background="#06140F" Foreground="#E8FFF5"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen">
+  <Window.Resources>
+    <Style x:Key="Ico" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0,0,10,0"/>
+    </Style>
+  </Window.Resources>
+
   <Grid>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="220"/>
+      <ColumnDefinition Width="248"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <Border Grid.Column="0" Background="#0A1F18" BorderBrush="#1C4A36" BorderThickness="0,0,1,0">
+
+    <Border Grid.Column="0" Background="#071A14" BorderBrush="#1C4A36" BorderThickness="0,0,1,0">
       <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Margin="16">
-          <TextBlock Text="LABORATÓRIO DE IA" FontSize="10" Foreground="#22C55E" FontFamily="Consolas"/>
-          <TextBlock Text="AI CHAT LAB" FontSize="18" FontWeight="SemiBold" Margin="0,4,0,12"/>
+        <StackPanel DockPanel.Dock="Top" Margin="18,20,18,8">
+          <Grid HorizontalAlignment="Left" Margin="0,0,0,10">
+            <Ellipse Width="52" Height="52" Fill="#14532D" Opacity="0.55"/>
+            <TextBlock Text="&#xE734;" FontFamily="Segoe MDL2 Assets"
+                       FontSize="26" Foreground="#4ADE80"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Grid>
+          <TextBlock Text="LABORATÓRIO DE IA" FontSize="10" FontWeight="Bold" Foreground="#22C55E"/>
+          <TextBlock Text="AI CHAT LAB" FontSize="20" FontWeight="Bold" Margin="0,2,0,0"/>
+          <TextBlock Text="Gera e publica o chat." Style="{StaticResource Hint}" Margin="0,4,0,0"/>
         </StackPanel>
-        <TextBlock x:Name="TokenStatus" DockPanel.Dock="Bottom" Margin="16" FontSize="11" Foreground="#5F8F78" Text="Token Vercel: ausente"/>
-        <StackPanel Margin="8">
-          <Button Content="01 Experimento" Click="Nav" Tag="1" Margin="0,2" Height="40"/>
-          <Button Content="02 Identidade" Click="Nav" Tag="2" Margin="0,2" Height="40"/>
-          <Button Content="03 Tema" Click="Nav" Tag="3" Margin="0,2" Height="40"/>
-          <Button Content="04 Preview" Click="Nav" Tag="4" Margin="0,2" Height="40"/>
-          <Button Content="05 Gerar / Publicar" Click="Nav" Tag="5" Margin="0,2" Height="40"/>
-          <Button Content="06 Histórico" Click="Nav" Tag="6" Margin="0,2" Height="40"/>
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="16,8,16,16">
+          <TextBlock Text="Idioma do app" Style="{StaticResource Hint}" Margin="0,0,0,6"/>
+          <ComboBox x:Name="LangBox" SelectedIndex="0" Height="34">
+            <ComboBoxItem Content="Português" Tag="pt"/>
+            <ComboBoxItem Content="English" Tag="en"/>
+            <ComboBoxItem Content="Español" Tag="es"/>
+          </ComboBox>
+          <TextBlock x:Name="TokenStatus" Margin="0,12,0,0" FontSize="11" Foreground="#6B8F7A" Text="Token Vercel: ausente"/>
+        </StackPanel>
+
+        <StackPanel Margin="12,8">
+          <Button x:Name="Nav1" Style="{StaticResource NavBtnActive}" Click="Nav" Tag="1">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE8A5;"/><TextBlock Text="01  Experimento"/>
+            </StackPanel>
+          </Button>
+          <Button x:Name="Nav2" Style="{StaticResource NavBtn}" Click="Nav" Tag="2">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE9F5;"/><TextBlock Text="02  Identidade"/>
+            </StackPanel>
+          </Button>
+          <Button x:Name="Nav3" Style="{StaticResource NavBtn}" Click="Nav" Tag="3">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE790;"/><TextBlock Text="03  Tema"/>
+            </StackPanel>
+          </Button>
+          <Button x:Name="Nav4" Style="{StaticResource NavBtn}" Click="Nav" Tag="4">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE7F4;"/><TextBlock Text="04  Preview"/>
+            </StackPanel>
+          </Button>
+          <Button x:Name="Nav5" Style="{StaticResource NavBtn}" Click="Nav" Tag="5">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE896;"/><TextBlock Text="05  Gerar / Publicar"/>
+            </StackPanel>
+          </Button>
+          <Button x:Name="Nav6" Style="{StaticResource NavBtn}" Click="Nav" Tag="6">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource Ico}" Text="&#xE81C;"/><TextBlock Text="06  Histórico"/>
+            </StackPanel>
+          </Button>
         </StackPanel>
       </DockPanel>
     </Border>
-    <Grid Grid.Column="1" Margin="24">
-      <StackPanel x:Name="Step1">
-        <TextBlock Text="Nome" Margin="0,0,0,4"/>
-        <TextBox x:Name="NameBox" Height="36" TextChanged="NameChanged"/>
-        <TextBlock Text="Slug" Margin="0,12,0,4"/>
-        <TextBox x:Name="SlugBox" Height="36" FontFamily="Consolas"/>
-        <TextBlock Text="Tagline" Margin="0,12,0,4"/>
-        <TextBox x:Name="TaglineBox" Height="36"/>
-      </StackPanel>
-      <StackPanel x:Name="Step2" Visibility="Collapsed">
-        <TextBlock Text="Persona / system prompt"/>
-        <TextBlock Text="A persona fica visível no HTML gerado." FontSize="11" Foreground="#86C9A8" Margin="0,0,0,6"/>
-        <TextBox x:Name="PersonaBox" Height="180" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
-        <TextBlock Text="Boas-vindas" Margin="0,12,0,4"/>
-        <TextBox x:Name="WelcomeBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
-      </StackPanel>
-      <StackPanel x:Name="Step3" Visibility="Collapsed">
-        <TextBlock Text="Tema padrão: Lab Green (#06140f / #22c55e), o mesmo da landing." TextWrapping="Wrap"/>
-      </StackPanel>
-      <DockPanel x:Name="Step4" Visibility="Collapsed">
-        <Button DockPanel.Dock="Top" Content="Recarregar preview" Click="ReloadPreview" Height="40" Margin="0,0,0,8"/>
-        <wv2:WebView2 x:Name="Preview"/>
-      </DockPanel>
-      <DockPanel x:Name="Step5" Visibility="Collapsed">
-        <StackPanel DockPanel.Dock="Top">
-          <Button Content="Gerar pasta…" Click="GenerateFolder" Height="40" Margin="0,0,0,8"/>
-          <TextBlock Text="Token Vercel" Margin="0,8,0,4"/>
-          <PasswordBox x:Name="TokenBox" Height="36"/>
-          <Button Content="Salvar token (DPAPI)" Click="SaveToken" Height="40" Margin="0,8,0,8"/>
-          <TextBlock Text="Projeto Vercel"/>
-          <TextBox x:Name="ProjectBox" Height="36"/>
-          <Button Content="Publicar na Vercel" Click="Publish" Height="40" Margin="0,8,0,8"/>
-        </StackPanel>
-        <TextBox x:Name="LogBox" IsReadOnly="True" FontFamily="Consolas" Background="#04110C" Foreground="#4ADE80" TextWrapping="Wrap"/>
-      </DockPanel>
-      <ListBox x:Name="Step6" Visibility="Collapsed" Background="#04110C" Foreground="#E8FFF5"/>
+
+    <Grid Grid.Column="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Padding="28,20,28,0">
+        <DockPanel>
+          <TextBlock x:Name="StepKicker" DockPanel.Dock="Top" Text="PASSO 01" FontSize="11" FontWeight="Bold" Foreground="#22C55E" Margin="0,0,0,4"/>
+          <TextBlock x:Name="StepTitle" Text="Defina o experimento" FontSize="26" FontWeight="Bold"/>
+        </DockPanel>
+      </Border>
+
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="28,16,28,24">
+        <Grid>
+          <StackPanel x:Name="Step1">
+            <TextBlock Text="Tema + nome viram um chat de IA pronto. Cada visitante usa a própria chave OpenRouter." Style="{StaticResource Hint}" Margin="0,0,0,16"/>
+            <TextBlock Text="Nome" Style="{StaticResource FieldLabel}"/>
+            <TextBox x:Name="NameBox" Height="42" TextChanged="NameChanged"/>
+            <TextBlock x:Name="NameError" Style="{StaticResource ErrorText}" Text="Nome deve ter 2–48 caracteres."/>
+            <TextBlock Text="Slug" Style="{StaticResource FieldLabel}" Margin="0,16,0,6"/>
+            <TextBox x:Name="SlugBox" Height="42" FontFamily="Consolas" TextChanged="SlugChanged"/>
+            <TextBlock x:Name="SlugError" Style="{StaticResource ErrorText}" Text="Slug: 3–48 caracteres, a-z, 0-9 e hífen."/>
+            <TextBlock Text="Tagline" Style="{StaticResource FieldLabel}" Margin="0,16,0,6"/>
+            <TextBox x:Name="TaglineBox" Height="42"/>
+            <TextBlock Text="Frase curta abaixo do título no site gerado." Style="{StaticResource Hint}" Margin="0,8,0,0"/>
+          </StackPanel>
+
+          <StackPanel x:Name="Step2" Visibility="Collapsed">
+            <TextBlock Text="Persona / system prompt" Style="{StaticResource FieldLabel}"/>
+            <TextBlock Text="A persona fica visível no HTML gerado — trate-a como pública." Style="{StaticResource Hint}"/>
+            <TextBox x:Name="PersonaBox" Height="200" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextChanged="PersonaChanged"/>
+            <TextBlock x:Name="PersonaError" Style="{StaticResource ErrorText}" Text="Persona deve ter pelo menos 20 caracteres."/>
+            <TextBlock Text="Boas-vindas" Style="{StaticResource FieldLabel}" Margin="0,16,0,6"/>
+            <TextBox x:Name="WelcomeBox" Height="96" TextWrapping="Wrap" AcceptsReturn="True"/>
+            <TextBlock Text="Primeira mensagem do assistente no chat." Style="{StaticResource Hint}" Margin="0,8,0,0"/>
+          </StackPanel>
+
+          <StackPanel x:Name="Step3" Visibility="Collapsed">
+            <TextBlock Text="O tema padrão é o mesmo da landing: Lab Green." Style="{StaticResource Hint}"/>
+            <Border Style="{StaticResource Card}" Margin="0,8,0,16">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,18,0">
+                  <Border Width="28" Height="28" CornerRadius="8" Background="#06140F" BorderBrush="#22C55E" BorderThickness="1" Margin="0,0,6,0"/>
+                  <Border Width="28" Height="28" CornerRadius="8" Background="#0A1F18" BorderBrush="#1C4A36" BorderThickness="1" Margin="0,0,6,0"/>
+                  <Border Width="28" Height="28" CornerRadius="8" Background="#22C55E" Margin="0,0,6,0"/>
+                  <Border Width="28" Height="28" CornerRadius="8" Background="#4ADE80"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="Lab Green" FontWeight="Bold" FontSize="16"/>
+                  <TextBlock Text="#06140f  ·  #22c55e  ·  #4ade80" FontFamily="Consolas" Foreground="#86EFAC" FontSize="12"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+            <CheckBox x:Name="GridCheck" Content="Mostrar grid do laboratório no site" IsChecked="True"/>
+            <CheckBox x:Name="BrandCheck" Content="Rodapé feito com AI Chat Lab" IsChecked="True"/>
+            <TextBlock Text="Modelo padrão" Style="{StaticResource FieldLabel}" Margin="0,18,0,6"/>
+            <ComboBox x:Name="ModelBox" Height="38" SelectedIndex="0">
+              <ComboBoxItem Content="openai/gpt-4o-mini"/>
+              <ComboBoxItem Content="openai/gpt-4o"/>
+              <ComboBoxItem Content="anthropic/claude-3.5-sonnet"/>
+              <ComboBoxItem Content="google/gemini-2.0-flash-001"/>
+              <ComboBoxItem Content="meta-llama/llama-3.3-70b-instruct"/>
+              <ComboBoxItem Content="deepseek/deepseek-chat"/>
+              <ComboBoxItem Content="mistralai/mistral-nemo"/>
+            </ComboBox>
+          </StackPanel>
+
+          <DockPanel x:Name="Step4" Visibility="Collapsed">
+            <StackPanel DockPanel.Dock="Top">
+              <TextBlock Text="Preview local sem rede. A conversa de verdade só existe depois do deploy." Style="{StaticResource Hint}"/>
+              <Button Style="{StaticResource GhostBtn}" Content="Recarregar preview" Click="ReloadPreview" Margin="0,0,0,10"/>
+              <TextBlock x:Name="PreviewError" Style="{StaticResource ErrorText}" Margin="0,0,0,10"/>
+            </StackPanel>
+            <Border CornerRadius="14" BorderBrush="#1C4A36" BorderThickness="1" ClipToBounds="True" Background="#04110C">
+              <wv2:WebView2 x:Name="Preview"/>
+            </Border>
+          </DockPanel>
+
+          <DockPanel x:Name="Step5" Visibility="Collapsed">
+            <StackPanel DockPanel.Dock="Top">
+              <TextBlock Text="Gera a pasta do site ou publica direto na Vercel. Nenhuma chave OpenRouter entra no pacote." Style="{StaticResource Hint}"/>
+              <Button Style="{StaticResource PrimaryBtn}" Content="Gerar arquivos (zip / pasta)" Click="GenerateFolder" Margin="0,4,0,16"/>
+              <TextBlock Text="Token Vercel" Style="{StaticResource FieldLabel}"/>
+              <PasswordBox x:Name="TokenBox" Height="42"/>
+              <TextBlock Text="Fica só neste PC (DPAPI). Não vai para o histórico nem para o site gerado." Style="{StaticResource Hint}" Margin="0,6,0,8"/>
+              <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="12"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource GhostBtn}" Content="Salvar token neste PC" Click="SaveToken"/>
+                <Button Grid.Column="2" Style="{StaticResource GhostBtn}" Content="Esquecer token" Click="ForgetToken"/>
+              </Grid>
+              <TextBlock Text="Nome do projeto Vercel" Style="{StaticResource FieldLabel}"/>
+              <TextBox x:Name="ProjectBox" Height="42"/>
+              <Button Style="{StaticResource PrimaryBtn}" Content="Publicar na Vercel" Click="Publish" Margin="0,14,0,12"/>
+              <TextBlock x:Name="PublishError" Style="{StaticResource ErrorText}" Margin="0,0,0,8"/>
+            </StackPanel>
+            <Border Style="{StaticResource Card}" Padding="0">
+              <TextBox x:Name="LogBox" IsReadOnly="True" FontFamily="Consolas" FontSize="12"
+                       Background="Transparent" Foreground="#4ADE80" BorderThickness="0"
+                       TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                       AcceptsReturn="True" Text="> pronto&#x0a;"/>
+            </Border>
+          </DockPanel>
+
+          <DockPanel x:Name="Step6Host" Visibility="Collapsed">
+            <TextBlock DockPanel.Dock="Top" Text="Experimentos gerados neste PC." Style="{StaticResource Hint}"/>
+            <ListBox x:Name="Step6" Background="Transparent" BorderThickness="0" Foreground="#E8FFF5" FontSize="13" Padding="0">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource Card}" Margin="0,0,0,10" Padding="14">
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </DockPanel>
+        </Grid>
+      </ScrollViewer>
     </Grid>
   </Grid>
 </Window>
