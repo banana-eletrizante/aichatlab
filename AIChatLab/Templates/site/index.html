@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}" dir="{{DIR}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{NAME}}</title>
+    <meta name="description" content="{{TAGLINE}}" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <header class="top">
+      <div class="brand">
+        <h1>{{NAME}}</h1>
+        <p class="tagline">{{TAGLINE}}</p>
+      </div>
+      <button type="button" id="btn-settings" class="icon-btn" aria-label="{{UI_SETTINGS}}">⚙</button>
+    </header>
+    <main id="thread" class="thread" aria-live="polite"></main>
+    <form id="composer" class="composer">
+      <label class="sr-only" for="input">{{UI_MESSAGE}}</label>
+      <textarea id="input" rows="1" placeholder="{{UI_PLACEHOLDER}}" autocomplete="off"></textarea>
+      <button type="button" id="btn-stop" class="ghost" hidden>{{UI_STOP}}</button>
+      <button type="submit" id="btn-send">{{UI_SEND}}</button>
+    </form>
+    {{BRANDING_HTML}}
+    <div id="key-modal" class="modal" hidden>
+      <div class="modal-card" role="dialog" aria-labelledby="key-title">
+        <h2 id="key-title">{{UI_KEY_TITLE}}</h2>
+        <p>{{UI_KEY_BODY}}</p>
+        <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer">openrouter.ai/keys</a>
+        <input id="key-input" type="password" placeholder="sk-or-..." autocomplete="off" />
+        <p class="hint">{{UI_KEY_HINT}}</p>
+        <button type="button" id="btn-save-key">{{UI_SAVE_KEY}}</button>
+      </div>
+    </div>
+    <div id="settings" class="modal" hidden>
+      <div class="modal-card" role="dialog">
+        <h2>{{UI_SETTINGS}}</h2>
+        <label>{{UI_MODEL}}<select id="model-select"></select></label>
+        <label>{{UI_CUSTOM_MODEL}}<input id="custom-model" type="text" placeholder="provider/model" /></label>
+        <label>{{UI_KEY}}<input id="settings-key" type="password" placeholder="sk-or-..." autocomplete="off" /></label>
+        <div class="row">
+          <button type="button" id="btn-clear-key" class="ghost">{{UI_CLEAR_KEY}}</button>
+          <button type="button" id="btn-clear-thread" class="ghost">{{UI_CLEAR_CHAT}}</button>
+        </div>
+        <button type="button" id="btn-close-settings">{{UI_CLOSE}}</button>
+      </div>
+    </div>
+    <div id="toast" class="toast" hidden></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
