@@ -18,7 +18,7 @@ public static class Slug
         }
         var s = sb.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
         s = Regex.Replace(s, @"[^a-z0-9]+", "-");
-        s = Regex.Replace(s, @"^-+|-+", "");
+        s = Regex.Replace(s, @"^-+|-+$", "");
         return s.Length > 48 ? s[..48] : s;
     }
 
