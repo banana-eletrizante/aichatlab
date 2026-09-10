@@ -7,11 +7,11 @@ Tema + nome viram um chat pronto na Vercel. Cada visitante cola a **própria** c
 - Site: [andre-rosler.vercel.app/aichatlab](https://andre-rosler.vercel.app/aichatlab)
 - Autor: André Rösler
 - Identidade: Erlenmeyer lab-green (`#06140f` / `#22c55e`)
-- Versão atual: **v1.1 beta**
+- Versão atual: **v1.1**
 
 ## Download
 
-- App Windows (self-contained, beta): https://github.com/banana-eletrizante/aichatlab/releases/download/v1.1-beta/AIChatLab_v1.1-beta.exe
+- App Windows (self-contained): https://github.com/banana-eletrizante/aichatlab/releases/download/v1.1/AIChatLab_v1.1.exe
 - Página: https://andre-rosler.vercel.app/aichatlab
 - Código: `git clone https://github.com/banana-eletrizante/aichatlab.git`
 
