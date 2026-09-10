@@ -1,8 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using AIChatLab.Helpers;
 using AIChatLab.Models;
 using AIChatLab.Services;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 
 namespace AIChatLab;
@@ -56,6 +58,7 @@ public partial class MainWindow : Window
         StepKicker.Text = "PASSO 0" + n;
         StepTitle.Text = Titles[n];
         ApplyNav(n);
+        UpdateFooter(n);
         if (n == 4) _ = ReloadPreviewAsync(silent: false);
         if (n == 6) RefreshHistory();
     }
@@ -68,6 +71,58 @@ public partial class MainWindow : Window
         for (var i = 0; i < navs.Length; i++)
             navs[i].Style = (Style)FindResource(i + 1 == n ? "NavBtnActive" : "NavBtn");
     }
+
+    void UpdateFooter(int n)
+    {
+        ProgressText.Text = $"{n:00} / 06";
+        BackButton.Visibility = n == 1 ? Visibility.Hidden : Visibility.Visible;
+        NextButton.Visibility = n == 6 ? Visibility.Hidden : Visibility.Visible;
+        ProgressDots.Items.Clear();
+        for (var i = 1; i <= 6; i++)
+        {
+            ProgressDots.Items.Add(new System.Windows.Shapes.Ellipse
+            {
+                Width = i == n ? 22 : 7,
+                Height = 7,
+                Margin = new Thickness(0, 0, 6, 0),
+                Fill = (System.Windows.Media.Brush)FindResource(i <= n ? "LabSoft" : "LabBorder"),
+            });
+        }
+    }
+
+    void PreviousStep(object sender, RoutedEventArgs e) => ShowStep(Math.Max(1, _step - 1));
+
+    void NextStep(object sender, RoutedEventArgs e)
+    {
+        // Nos passos de conteúdo a pessoa pode avançar sem perder o que já digitou.
+        ShowStep(Math.Min(6, _step + 1));
+    }
+
+    void DragWindow(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            ToggleWindowState();
+            return;
+        }
+        if (e.LeftButton == MouseButtonState.Pressed)
+            DragMove();
+    }
+
+    void MinimizeWindow(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    void ToggleMaximize(object sender, RoutedEventArgs e) => ToggleWindowState();
+
+    void CloseWindow(object sender, RoutedEventArgs e) => Close();
+
+    void WindowStateChanged(object? sender, EventArgs e)
+    {
+        if (MaximizeGlyph is not null)
+            MaximizeGlyph.Text = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+    }
+
+    void ToggleWindowState() =>
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
     void NameChanged(object sender, TextChangedEventArgs e)
     {
@@ -91,6 +146,7 @@ public partial class MainWindow : Window
     void PersonaChanged(object sender, TextChangedEventArgs e)
     {
         _exp.Persona = PersonaBox.Text;
+        PersonaCount.Text = $"{PersonaBox.Text.Length} caracteres";
         ValidateLive();
     }
 
@@ -150,17 +206,53 @@ public partial class MainWindow : Window
     {
         var err = HardValidate();
         ShowInline(PreviewError, err);
-        if (err is not null) return;
+        if (err is not null)
+        {
+            PreviewOverlay.Visibility = Visibility.Visible;
+            PreviewOverlayTitle.Text = "Preencha os passos 01 e 02";
+            PreviewOverlayBody.Text = "O preview será liberado quando os dados obrigatórios estiverem completos.";
+            PreviewStatus.Text = "Dados pendentes";
+            PreviewStatus.Foreground = (System.Windows.Media.Brush)FindResource("LabMuted");
+            PreviewStatusDot.Fill = (System.Windows.Media.Brush)FindResource("LabMuted");
+            return;
+        }
+        PreviewOverlay.Visibility = Visibility.Visible;
+        PreviewOverlayTitle.Text = "Preparando o preview";
+        PreviewOverlayBody.Text = "O primeiro carregamento pode levar alguns segundos.";
+        PreviewStatus.Text = "Preparando";
+        PreviewStatus.Foreground = (System.Windows.Media.Brush)FindResource("LabMint");
+        PreviewStatusDot.Fill = (System.Windows.Media.Brush)FindResource("LabMuted");
         try
         {
             var files = TemplateService.Generate(_exp);
             var html = PreviewService.ToSrcDoc(files);
+            // O WebView2 demora um pouco na primeira abertura, então o estado fica visível até a navegação terminar.
             await Preview.EnsureCoreWebView2Async();
             Preview.NavigateToString(html);
         }
         catch (Exception ex)
         {
+            PreviewOverlayTitle.Text = "Preview indisponível";
+            PreviewOverlayBody.Text = "Confira se o Microsoft Edge WebView2 Runtime está instalado.";
+            PreviewStatus.Text = "Falha no preview";
+            PreviewStatus.Foreground = (System.Windows.Media.Brush)FindResource("LabDanger");
+            PreviewStatusDot.Fill = (System.Windows.Media.Brush)FindResource("LabDanger");
             if (!silent) ShowInline(PreviewError, ex.Message);
+        }
+    }
+
+    void PreviewNavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
+    {
+        PreviewOverlay.Visibility = e.IsSuccess ? Visibility.Collapsed : Visibility.Visible;
+        PreviewStatus.Text = e.IsSuccess ? "Preview atualizado" : "Falha no preview";
+        var brush = (System.Windows.Media.Brush)FindResource(e.IsSuccess ? "LabSoft" : "LabDanger");
+        PreviewStatus.Foreground = brush;
+        PreviewStatusDot.Fill = brush;
+        if (!e.IsSuccess)
+        {
+            PreviewOverlayTitle.Text = "Preview indisponível";
+            PreviewOverlayBody.Text = "O conteúdo local não pôde ser carregado.";
+            ShowInline(PreviewError, "Não foi possível carregar o preview local.");
         }
     }
 

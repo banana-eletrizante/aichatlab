@@ -15,6 +15,17 @@
     <SolidColorBrush x:Key="LabMuted" Color="#6B8F7A"/>
     <SolidColorBrush x:Key="LabDanger" Color="#F87171"/>
     <SolidColorBrush x:Key="LabNavIdle" Color="#14532D"/>
+    <Geometry x:Key="FlaskGeometry">M 14,2 L 14,8 C 14,8.35 14.08,8.68 14.25,8.96 L 19.76,19.04 C 20.48,20.37 19.52,22 18,22 L 6,22 C 4.48,22 3.52,20.37 4.24,19.04 L 9.75,8.96 C 9.92,8.68 10,8.35 10,8 L 10,2 M 8.5,2 L 15.5,2 M 6.45,15 L 17.55,15</Geometry>
+    <DrawingBrush x:Key="LabGridBrush" TileMode="Tile" Viewport="0,0,48,48"
+                  ViewportUnits="Absolute" Viewbox="0,0,48,48" ViewboxUnits="Absolute">
+      <DrawingBrush.Drawing>
+        <GeometryDrawing Brush="#06140F" Geometry="M 0,0 H 48 V 48 H 0 Z M 0,0 H 48 M 0,0 V 48">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#123B2C" Thickness="0.7"/>
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
 
     <Style TargetType="Window">
       <Setter Property="Background" Value="{StaticResource LabBg}"/>
@@ -43,6 +54,20 @@
       <Setter Property="FontWeight" Value="SemiBold"/>
       <Setter Property="Margin" Value="0,6,0,0"/>
       <Setter Property="Visibility" Value="Collapsed"/>
+    </Style>
+
+    <Style x:Key="Eyebrow" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource LabAccent}"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style x:Key="Pill" TargetType="Border">
+      <Setter Property="Background" Value="#102E23"/>
+      <Setter Property="BorderBrush" Value="#276749"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="10,4"/>
     </Style>
 
     <Style TargetType="TextBox">
@@ -93,12 +118,139 @@
       <Setter Property="Background" Value="{StaticResource LabInput}"/>
       <Setter Property="Foreground" Value="{StaticResource LabFg}"/>
       <Setter Property="BorderBrush" Value="{StaticResource LabBorder}"/>
-      <Setter Property="Padding" Value="8,6"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBox">
+            <Grid>
+              <ToggleButton Focusable="False" ClickMode="Press"
+                            IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                <ToggleButton.Template>
+                  <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="ComboBorder" Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                            BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                            BorderThickness="{Binding BorderThickness, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                            CornerRadius="10">
+                      <Path Data="M 0,0 L 4,4 L 8,0" Stroke="#86EFAC" StrokeThickness="1.5"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,13,0"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="ComboBorder" Property="BorderBrush" Value="#22C55E"/>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </ToggleButton.Template>
+              </ToggleButton>
+              <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
+                                HorizontalAlignment="Left" IsHitTestVisible="False"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+              <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
+                     Placement="Bottom" AllowsTransparency="True" Focusable="False">
+                <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                        Background="#071A14" BorderBrush="#1C4A36" BorderThickness="1"
+                        CornerRadius="10" Padding="4" Margin="0,4,0,0">
+                  <ScrollViewer MaxHeight="300"><ItemsPresenter/></ScrollViewer>
+                </Border>
+              </Popup>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ComboBoxItem">
+      <Setter Property="Foreground" Value="{StaticResource LabFg}"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Padding" Value="11,8"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ComboBoxItem">
+            <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+              <ContentPresenter/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="ItemBorder" Property="Background" Value="#123B2C"/>
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="ItemBorder" Property="Background" Value="#14532D"/>
+                <Setter Property="Foreground" Value="#86EFAC"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
 
     <Style TargetType="CheckBox">
       <Setter Property="Foreground" Value="{StaticResource LabFg}"/>
       <Setter Property="Margin" Value="0,6,0,0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <Grid Width="38" Height="22">
+              <Border x:Name="Track" Background="#123B2C" BorderBrush="#276749" BorderThickness="1" CornerRadius="11"/>
+              <Ellipse x:Name="Thumb" Width="16" Height="16" Fill="#A7F3D0"
+                       HorizontalAlignment="Left" Margin="3,0,0,0"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Track" Property="Background" Value="#22C55E"/>
+                <Setter TargetName="Track" Property="BorderBrush" Value="#4ADE80"/>
+                <Setter TargetName="Thumb" Property="Fill" Value="#06140F"/>
+                <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
+                <Setter TargetName="Thumb" Property="Margin" Value="0,0,3,0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="LabScrollThumb" TargetType="Thumb">
+      <Setter Property="Background" Value="#276749"/>
+      <Setter Property="Margin" Value="2"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Thumb">
+            <Border x:Name="ThumbBorder" Background="{TemplateBinding Background}" CornerRadius="4"/>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="ThumbBorder" Property="Background" Value="#4ADE80"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="10"/>
+      <Setter Property="Background" Value="#071A14"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Border Background="{TemplateBinding Background}" CornerRadius="5">
+              <Track x:Name="PART_Track" IsDirectionReversed="True">
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb><Thumb Style="{StaticResource LabScrollThumb}"/></Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                </Track.IncreaseRepeatButton>
+              </Track>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
 
     <Style x:Key="NavBtn" TargetType="Button">
@@ -183,6 +335,47 @@
           </ControlTemplate>
         </Setter.Value>
       </Setter>
+    </Style>
+
+    <Style x:Key="QuietBtn" TargetType="Button" BasedOn="{StaticResource GhostBtn}">
+      <Setter Property="Background" Value="#071A14"/>
+      <Setter Property="MinWidth" Value="118"/>
+    </Style>
+
+    <Style x:Key="WindowActionBtn" TargetType="Button">
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="#A7F3D0"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="7">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#123B2C"/>
+                <Setter Property="Foreground" Value="#E8FFF5"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#14532D"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="WindowCloseBtn" TargetType="Button" BasedOn="{StaticResource WindowActionBtn}">
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#7F1D1D"/>
+          <Setter Property="Foreground" Value="#FEE2E2"/>
+        </Trigger>
+      </Style.Triggers>
     </Style>
 
     <Style x:Key="Card" TargetType="Border">

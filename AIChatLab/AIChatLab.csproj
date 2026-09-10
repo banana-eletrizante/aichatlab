@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -7,11 +7,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AIChatLab</RootNamespace>
     <AssemblyName>AIChatLab</AssemblyName>
-    <Version>1.1.0-beta</Version>
-    <InformationalVersion>1.1.0-beta</InformationalVersion>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1.0</InformationalVersion>
     <Authors>André Rösler</Authors>
     <Product>AI Chat Lab</Product>
-    <ApplicationIcon Condition="Exists('Assets\AIChatLab.ico')">Assets\AIChatLab.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\AIChatLab.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Using Include="System.IO" />
@@ -20,6 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\site\**\*" />
-    <Resource Include="Assets\AIChatLab.ico" Condition="Exists('Assets\AIChatLab.ico')" />
+    <Resource Include="Assets\AIChatLab.ico" />
   </ItemGroup>
 </Project>
