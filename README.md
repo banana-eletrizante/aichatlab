@@ -10,18 +10,12 @@ Tema + nome viram um chat pronto na Vercel. Cada visitante cola a **própria** c
 
 ## Download
 
-Clone ou baixe o código-fonte:
+- App Windows (self-contained): https://github.com/banana-eletrizante/aichatlab/releases/download/v1.0/AIChatLab_v1.0.exe
+- Página: https://andre-rosler.vercel.app/aichatlab
+- Código: `git clone https://github.com/banana-eletrizante/aichatlab.git`
 
 ```bash
-git clone https://github.com/banana-eletrizante/aichatlab.git
-```
-
-ZIP: https://github.com/banana-eletrizante/aichatlab/archive/refs/heads/main.zip
-
-Não há `.exe` pré-compilado neste repositório. Compile no Windows:
-
-```bash
-dotnet publish AIChatLab/AIChatLab.csproj -c Release -r win-x64 --self-contained false
+dotnet publish AIChatLab/AIChatLab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
 ```
 
 ## Requisitos
