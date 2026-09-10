@@ -7,7 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AIChatLab</RootNamespace>
     <AssemblyName>AIChatLab</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.1.0-beta</Version>
+    <InformationalVersion>1.1.0-beta</InformationalVersion>
     <Authors>André Rösler</Authors>
     <Product>AI Chat Lab</Product>
     <ApplicationIcon Condition="Exists('Assets\AIChatLab.ico')">Assets\AIChatLab.ico</ApplicationIcon>
