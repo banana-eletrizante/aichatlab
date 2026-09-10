@@ -5,6 +5,11 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v1.1)"
+        required: true
+        default: "v1.1"
 
 permissions:
   contents: write
@@ -17,22 +22,29 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Resolve tag
+        id: meta
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
       - name: Publish
         run: |
-          dotnet publish AIChatLab/AIChatLab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o dist
+          dotnet publish AIChatLab/AIChatLab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o dist
       - name: Rename
         shell: pwsh
         run: |
-          Move-Item -Force dist/AIChatLab.exe dist/AIChatLab_v1.1-beta.exe
-      - uses: softprops/action-gh-release@v2
+          $tag = "${{ steps.meta.outputs.tag }}"
+          Move-Item -Force dist/AIChatLab.exe "dist/AIChatLab_${tag}.exe"
+          Get-ChildItem dist
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1-beta
-          name: AI Chat Lab v1.1 beta
-          prerelease: true
-          files: dist/AIChatLab_v1.1-beta.exe
-          generate_release_notes: true
-          body: |
-            Beta da versão atual do AI Chat Lab (UI Lab Green, 6 passos, deploy Vercel).
-            Executável Windows x64 self-contained. Não requer instalação separada do .NET.
+          tag_name: ${{ steps.meta.outputs.tag }}
+          files: dist/AIChatLab_*.exe
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
