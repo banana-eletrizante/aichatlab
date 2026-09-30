@@ -25,6 +25,7 @@ export default async function handler(req, res) {
   }
   const body = req.body || {};
   const { messages, model, temperature, max_tokens } = body;
+  const wantStream = body.stream !== false;
   if (!Array.isArray(messages) || messages.length === 0 || messages.length > 40) {
     res.status(400).json({ error: "invalid_messages" });
     return;
@@ -54,13 +55,36 @@ export default async function handler(req, res) {
         messages,
         temperature: safeTemp,
         max_tokens: safeMax,
-        stream: false,
+        stream: wantStream,
       }),
     });
-    const text = await r.text();
+
+    if (!wantStream || !r.ok) {
+      const text = await r.text();
+      res.status(r.status);
+      res.setHeader("Content-Type", "application/json");
+      res.send(text);
+      return;
+    }
+
     res.status(r.status);
-    res.setHeader("Content-Type", "application/json");
-    res.send(text);
+    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    if (r.body && typeof r.body.getReader === "function") {
+      const reader = r.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(typeof value === "string" ? value : decoder.decode(value, { stream: true }));
+      }
+      res.end();
+      return;
+    }
+
+    res.send(await r.text());
   } catch (err) {
     res.status(502).json({ error: "upstream_failed" });
   }
