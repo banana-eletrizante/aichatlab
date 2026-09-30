@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -74,11 +75,19 @@ public sealed class VercelService
             {
                 var host = body.RootElement.TryGetProperty("url", out var urlEl) ? urlEl.GetString() : urlHint;
                 var url = host is null ? "" : host.StartsWith("http", StringComparison.Ordinal) ? host : "https://" + host;
+                TryOpen(url);
                 return new() { Ok = true, Url = url };
             }
             if (state == "ERROR") return new() { Ok = false, Error = "deploy_error" };
             await Task.Delay(2000);
         }
         return new() { Ok = false, Error = "timeout" };
+    }
+
+    static void TryOpen(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+        try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch { }
     }
 }
