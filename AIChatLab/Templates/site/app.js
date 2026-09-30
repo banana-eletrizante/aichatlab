@@ -39,20 +39,23 @@ function renderMarkdown(raw) {
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br>");
 }
+function attachCopy(div, text) {
+  const old = div.querySelector(".copy-btn");
+  if (old) old.remove();
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "ghost copy-btn";
+  btn.textContent = UI.copy || "Copiar";
+  btn.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(text); toast(UI.copy || "Copiado"); } catch {}
+  });
+  div.appendChild(btn);
+}
 function addBubble(role, text) {
   const div = document.createElement("div");
   div.className = "bubble " + role;
   div.innerHTML = renderMarkdown(text);
-  if (role === "assistant") {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "ghost copy-btn";
-    btn.textContent = UI.copy || "Copiar";
-    btn.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(text); toast(UI.copy || "Copiado"); } catch {}
-    });
-    div.appendChild(btn);
-  }
+  if (role === "assistant" && text) attachCopy(div, text);
   threadEl.appendChild(div);
   threadEl.scrollTop = threadEl.scrollHeight;
   return div;
@@ -83,6 +86,35 @@ function showKeyModal(force) {
   if (PREVIEW) return;
   if (!force && getKey()) return;
   keyModal.hidden = false;
+}
+async function readSse(res, onDelta) {
+  if (!res.body || !res.body.getReader) return null;
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let acc = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop() || "";
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const payload = trimmed.slice(5).trim();
+      if (!payload || payload === "[DONE]") continue;
+      try {
+        const json = JSON.parse(payload);
+        const delta = json.choices?.[0]?.delta?.content || json.choices?.[0]?.message?.content || "";
+        if (delta) {
+          acc += delta;
+          onDelta(acc);
+        }
+      } catch {}
+    }
+  }
+  return acc;
 }
 document.getElementById("btn-save-key").addEventListener("click", () => {
   const v = document.getElementById("key-input").value.trim();
@@ -138,19 +170,32 @@ form.addEventListener("submit", async (e) => {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-openrouter-key": getKey() },
       body: JSON.stringify({
-        model: getModel(), temperature: TEMPERATURE, max_tokens: MAX_TOKENS,
+        model: getModel(), temperature: TEMPERATURE, max_tokens: MAX_TOKENS, stream: true,
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
       }),
       signal: abortCtl.signal,
     });
-    const data = await res.json().catch(() => ({}));
+    const type = (res.headers.get("content-type") || "").toLowerCase();
     if (res.status === 401) throw new Error(UI.err401);
     if (res.status === 429) throw new Error(UI.err429);
-    if (!res.ok) throw new Error(data.error || UI.err500);
-    const content = data.choices?.[0]?.message?.content || "";
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || UI.err500);
+    }
+    let content = "";
+    if (type.includes("event-stream") || type.includes("text/plain")) {
+      content = await readSse(res, (acc) => {
+        bubble.innerHTML = renderMarkdown(acc);
+        threadEl.scrollTop = threadEl.scrollHeight;
+      }) || "";
+    } else {
+      const data = await res.json().catch(() => ({}));
+      content = data.choices?.[0]?.message?.content || "";
+      bubble.innerHTML = renderMarkdown(content);
+    }
     if (!content) throw new Error(UI.err500);
     messages.push({ role: "assistant", content }); persistThread();
-    bubble.innerHTML = renderMarkdown(content);
+    attachCopy(bubble, content);
   } catch (err) {
     const msg = err && err.name === "AbortError" ? UI.stopped : (err instanceof Error ? err.message : UI.errNet);
     toast(msg); bubble.innerHTML = renderMarkdown(msg);
