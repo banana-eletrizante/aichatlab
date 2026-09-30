@@ -5,60 +5,99 @@
   --accent: {{ACCENT}};
   --accent-soft: {{ACCENT_SOFT}};
   --danger: #f87171;
-  --muted: color-mix(in oklab, var(--text) 62%, var(--bg));
-  --border: color-mix(in oklab, var(--accent) 28%, transparent);
+  --muted: color-mix(in oklab, var(--text) 58%, var(--bg));
+  --border: color-mix(in oklab, var(--accent) 26%, transparent);
+  --shadow: color-mix(in oklab, black 35%, transparent);
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(1200px 480px at 50% -120px, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+    var(--bg);
   color: var(--text);
-  font-family: system-ui, "Segoe UI", sans-serif;
-  line-height: 1.5;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.55;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
 }
+::selection { background: color-mix(in oklab, var(--accent) 40%, transparent); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 .bg-grid {
   pointer-events: none; position: fixed; inset: 0; opacity: {{GRID_OPACITY}};
   background-image:
-    linear-gradient(color-mix(in oklab, var(--accent) 14%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--accent) 14%, transparent) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(color-mix(in oklab, var(--accent) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--accent) 12%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(180deg, black, transparent 88%);
 }
 .top {
   position: sticky; top: 0; z-index: 5;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 14px 16px; background: color-mix(in oklab, var(--bg) 88%, transparent);
+  padding: 16px 20px;
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
-h1 { margin: 0; font-size: 1.05rem; }
-.tagline { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mark {
+  width: 12px; height: 12px; border-radius: 99px; flex: none;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+h1 { margin: 0; font-size: 1.08rem; font-weight: 650; letter-spacing: -0.02em; }
+.tagline { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
 button {
   font: inherit; background: var(--accent); color: var(--bg);
-  border: 0; border-radius: 12px; min-height: 44px; padding: 0 16px; font-weight: 600; cursor: pointer;
+  border: 0; border-radius: 14px; min-height: 44px; padding: 0 16px; font-weight: 650; cursor: pointer;
 }
-.icon-btn { width: 44px; padding: 0; background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.icon-btn { width: 44px; padding: 0; background: color-mix(in oklab, var(--surface) 80%, transparent); color: var(--text); border: 1px solid var(--border); }
 button.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-.thread { flex: 1; width: min(720px, 100%); margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-.bubble { max-width: 86%; padding: 12px 14px; border-radius: 16px; overflow-wrap: anywhere; }
-.bubble.user { align-self: flex-end; background: var(--accent); color: var(--bg); }
-.bubble.assistant { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); }
-.copy-btn { margin-top: 8px; min-height: 32px; font-size: 0.78rem; }
+.thread { flex: 1; width: min(760px, 100%); margin: 0 auto; padding: 22px 16px 8px; display: flex; flex-direction: column; gap: 14px; }
+.bubble { max-width: 82%; padding: 13px 16px; border-radius: 18px; overflow-wrap: anywhere; box-shadow: 0 10px 30px var(--shadow); }
+.bubble.user { align-self: flex-end; background: var(--accent); color: var(--bg); border-bottom-right-radius: 6px; }
+.bubble.assistant { align-self: flex-start; background: color-mix(in oklab, var(--surface) 92%, var(--bg)); border: 1px solid var(--border); border-bottom-left-radius: 6px; }
+.bubble pre { overflow: auto; padding: 10px 12px; border-radius: 10px; background: color-mix(in oklab, var(--bg) 70%, black); font-size: 0.86rem; }
+.copy-btn { margin-top: 10px; min-height: 30px; font-size: 0.75rem; padding: 0 10px; }
 .composer {
-  position: sticky; bottom: 0; width: min(720px, 100%); margin: 0 auto;
-  display: flex; gap: 8px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--bg);
+  position: sticky; bottom: 0; width: min(760px, 100%); margin: 0 auto;
+  display: flex; gap: 8px; align-items: flex-end;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, var(--bg) 28%);
 }
 .composer textarea {
-  flex: 1; resize: none; min-height: 44px; max-height: 160px; padding: 10px 12px;
-  border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit;
+  flex: 1; resize: none; min-height: 48px; max-height: 160px; padding: 12px 14px;
+  border-radius: 16px; border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface) 88%, var(--bg));
+  color: var(--text); font: inherit; outline: none;
 }
-.branding { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 0 16px 12px; }
-.modal { position: fixed; inset: 0; background: color-mix(in oklab, var(--bg) 55%, black); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.composer textarea:focus { border-color: var(--accent-soft); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
+.branding { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 0 16px 16px; }
+.modal { position: fixed; inset: 0; background: color-mix(in oklab, var(--bg) 48%, black); display: grid; place-items: center; padding: 16px; z-index: 20; backdrop-filter: blur(8px); }
 .modal[hidden] { display: none; }
-.modal-card { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-.modal-card input, .modal-card select { width: 100%; min-height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 0 12px; }
-.toast { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--danger); padding: 10px 14px; border-radius: 12px; z-index: 30; }
+.modal-card {
+  width: min(440px, 100%);
+  background: color-mix(in oklab, var(--surface) 92%, var(--bg));
+  border: 1px solid var(--border); border-radius: 22px; padding: 22px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.modal-card h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.modal-card p, .hint { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.modal-card a { color: var(--accent-soft); }
+.modal-card label { display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; color: var(--muted); }
+.modal-card input, .modal-card select {
+  width: 100%; min-height: 44px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 0 12px;
+}
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.toast {
+  position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1px solid var(--danger);
+  padding: 10px 14px; border-radius: 12px; z-index: 30;
+}
 .toast[hidden] { display: none; }
+@media (max-width: 640px) {
+  .bubble { max-width: 92%; }
+}
