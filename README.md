@@ -1,30 +1,36 @@
 # AI Chat Lab
 
-App Windows que gera e publica sites de chat de IA.
+App Windows que transforma nome, persona e tema num site de chat e publica na Vercel.
 
-Tema + nome viram um chat pronto na Vercel. Cada visitante cola a **própria** chave OpenRouter. O token da Vercel fica criptografado com DPAPI neste computador.
+O visitante do site cola a **própria** chave OpenRouter. O token da Vercel fica só no seu PC, criptografado com DPAPI.
 
 - Site: [andre-rosler.vercel.app/aichatlab](https://andre-rosler.vercel.app/aichatlab)
-- Autor: André Rösler
-- Versão atual: **v1.3.0**
+- Versão: **1.3**
 
-## 1.3.0
+## Fluxo
 
-- Resposta em streaming (SSE) no chat publicado
-- Duplo clique no histórico reabre o experimento
-- Deploy READY abre a URL
-- Chave/modelo/conversa salvos por slug
-- Copiar resposta e limite de tamanho da mensagem
+1. Nome, slug, tagline e persona
+2. Cores / tema
+3. Modelos OpenRouter permitidos
+4. Preview local no WebView
+5. Gerar pasta
+6. Publicar na Vercel (abre a URL quando ficar READY)
 
-## Abrir
+O histórico guarda os experimentos. Duplo clique reabre o formulário.
+
+## O site gerado
+
+- Streaming SSE da OpenRouter
+- Chave, modelo e conversa salvos por slug no `localStorage`
+- Copiar resposta, parar geração, tema com grid e marca
+
+## Abrir o app
 
 ```bash
 dotnet restore
 dotnet run --project AIChatLab/AIChatLab.csproj
 ```
 
-Baixe o `.exe` nas [releases](https://github.com/banana-eletrizante/aichatlab/releases).
-
-## Licença
+`.exe` nas [releases](https://github.com/banana-eletrizante/aichatlab/releases). Para gerar: Actions → Release → `v1.3`.
 
 MIT © André Rösler
