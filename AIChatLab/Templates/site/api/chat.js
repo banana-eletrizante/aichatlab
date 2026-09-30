@@ -1,8 +1,11 @@
 export default async function handler(req, res) {
+  const origin = req.headers.origin || "";
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Headers", "content-type, x-openrouter-key");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Cache-Control", "no-store");
+
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "");
-    res.setHeader("Access-Control-Allow-Headers", "content-type, x-openrouter-key");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.status(204).end();
     return;
   }
@@ -11,7 +14,7 @@ export default async function handler(req, res) {
     return;
   }
   const rawLen = Number(req.headers["content-length"] || 0);
-  if (rawLen > 200000) {
+  if (rawLen > 120000) {
     res.status(413).json({ error: "payload_too_large" });
     return;
   }
@@ -22,32 +25,43 @@ export default async function handler(req, res) {
   }
   const body = req.body || {};
   const { messages, model, temperature, max_tokens } = body;
-  if (!Array.isArray(messages) || messages.length === 0 || messages.length > 80) {
+  if (!Array.isArray(messages) || messages.length === 0 || messages.length > 40) {
     res.status(400).json({ error: "invalid_messages" });
+    return;
+  }
+  const tooLong = messages.some((m) => typeof m?.content === "string" && m.content.length > 8000);
+  if (tooLong) {
+    res.status(400).json({ error: "message_too_long" });
     return;
   }
   if (typeof model !== "string" || model.length < 3 || model.length > 120) {
     res.status(400).json({ error: "invalid_model" });
     return;
   }
-  const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + key,
-      "Content-Type": "application/json",
-      "HTTP-Referer": req.headers.referer || "",
-      "X-Title": "{{NAME}}",
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      temperature: typeof temperature === "number" ? temperature : 0.7,
-      max_tokens: typeof max_tokens === "number" ? max_tokens : 1024,
-      stream: false,
-    }),
-  });
-  const text = await r.text();
-  res.status(r.status);
-  res.setHeader("Content-Type", "application/json");
-  res.send(text);
+  const safeTemp = typeof temperature === "number" && temperature >= 0 && temperature <= 2 ? temperature : 0.7;
+  const safeMax = typeof max_tokens === "number" && max_tokens > 0 && max_tokens <= 4096 ? max_tokens : 1024;
+  try {
+    const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + key,
+        "Content-Type": "application/json",
+        "HTTP-Referer": req.headers.referer || "",
+        "X-Title": "{{NAME}}",
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature: safeTemp,
+        max_tokens: safeMax,
+        stream: false,
+      }),
+    });
+    const text = await r.text();
+    res.status(r.status);
+    res.setHeader("Content-Type", "application/json");
+    res.send(text);
+  } catch (err) {
+    res.status(502).json({ error: "upstream_failed" });
+  }
 }
