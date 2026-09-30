@@ -5,9 +5,10 @@ const ALLOWED_MODELS = {{MODELS_JSON}};
 const TEMPERATURE = {{TEMPERATURE}};
 const MAX_TOKENS = {{MAX_TOKENS}};
 const UI = {{UI_JSON}};
-const LS_KEY = "aicl:key";
-const LS_MODEL = "aicl:model";
-const LS_THREAD = "aicl:thread";
+const SLUG = "{{SLUG}}";
+const LS_KEY = "aicl:"+SLUG+":key";
+const LS_MODEL = "aicl:"+SLUG+":model";
+const LS_THREAD = "aicl:"+SLUG+":thread";
 const PREVIEW = window.__AICHATLAB_PREVIEW__ === true;
 
 const threadEl = document.getElementById("thread");
@@ -42,6 +43,16 @@ function addBubble(role, text) {
   const div = document.createElement("div");
   div.className = "bubble " + role;
   div.innerHTML = renderMarkdown(text);
+  if (role === "assistant") {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "ghost copy-btn";
+    btn.textContent = UI.copy || "Copiar";
+    btn.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(text); toast(UI.copy || "Copiado"); } catch {}
+    });
+    div.appendChild(btn);
+  }
   threadEl.appendChild(div);
   threadEl.scrollTop = threadEl.scrollHeight;
   return div;
@@ -106,6 +117,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
+  if (text.length > 4000) { toast("Mensagem longa demais."); return; }
   if (!PREVIEW && !getKey()) { showKeyModal(true); return; }
   input.value = "";
   messages.push({ role: "user", content: text });
